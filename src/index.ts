@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express, { Express, Request, Response, NextFunction } from 'express';
 import { config } from './config/env';
 import { apiRoutes } from './routes/api';
+import { connectDatabase } from './config/database';
 
 const app: Express = express();
 
@@ -36,9 +37,20 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
 // Start server
 const port = config.port;
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-    console.log(`Environment: ${config.nodeEnv}`);
-});
+
+async function startServer(): Promise<void> {
+    try {
+        await connectDatabase();
+        app.listen(port, () => {
+            console.log(`Server running at http://localhost:${port}`);
+            console.log(`Environment: ${config.nodeEnv}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+}
+
+startServer();
 
 export default app;
