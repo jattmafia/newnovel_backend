@@ -54,7 +54,7 @@ export async function registerUser(data: SignupData): Promise<{ userId: string; 
     };
 
     // Send verification email BEFORE inserting user into database
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
     const verificationLink = `${backendUrl}/api/auth/verify-email?token=${verificationToken}`;
     const emailHTML = generateVerificationEmailHTML(data.name, verificationLink);
 

@@ -28,7 +28,7 @@ Run the development server with hot-reload:
 npm run dev
 ```
 
-The server will start at `http://localhost:3000`
+The server will start at `http://localhost:5000`
 
 ### Build & Production
 
