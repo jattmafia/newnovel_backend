@@ -148,3 +148,55 @@ export async function loginUser(email: string, password: string): Promise<{ toke
         user: userWithoutPassword,
     };
 }
+
+export async function resendVerificationEmail(email: string): Promise<{ message: string }> {
+    const db = getDatabase();
+    const usersCollection = db.collection<User>('users');
+
+    const user = await usersCollection.findOne({ email });
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    if (user.isEmailVerified) {
+        throw new Error('Email is already verified');
+    }
+
+    // Generate new verification token
+    const signOptions: SignOptions = { expiresIn: '24h' };
+    const verificationToken = jwt.sign(
+        { email: user.email },
+        config.jwtSecret as string,
+        signOptions
+    );
+
+    // Update user with new token
+    await usersCollection.updateOne(
+        { email: user.email },
+        {
+            $set: {
+                emailVerificationToken: verificationToken,
+                emailVerificationTokenExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+                updatedAt: new Date(),
+            },
+        }
+    );
+
+    // Send verification email
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+    const verificationLink = `${backendUrl}/api/auth/verify-email?token=${verificationToken}`;
+    const emailHTML = generateVerificationEmailHTML(user.name, verificationLink);
+
+    try {
+        await sendEmail({
+            to: user.email,
+            subject: 'Verify your email - New Novel',
+            html: emailHTML,
+        });
+    } catch (error) {
+        console.error('Failed to send verification email:', error);
+        throw new Error('Failed to send verification email. Please try again.');
+    }
+
+    return { message: 'Verification email sent successfully' };
+}

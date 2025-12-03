@@ -3,6 +3,7 @@ import {
     signupController,
     verifyEmailController,
     loginController,
+    resendVerificationEmailController,
 } from '../controllers/authController';
 
 const router = Router();
@@ -17,5 +18,6 @@ router.use((req: Request, _res: Response, next: NextFunction) => {
 router.post('/signup', signupController);
 router.get('/verify-email', verifyEmailController);
 router.post('/login', loginController);
+router.post('/resend-verification', resendVerificationEmailController);
 
 export { router as authRoutes };

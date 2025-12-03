@@ -7,11 +7,7 @@ export async function updateProfileController(req: Request, res: Response): Prom
         const userId = (req as any).userId;
         const { username, bio, location } = req.body;
 
-        console.log('📝 [UPDATE PROFILE] Controller called');
-        console.log('📝 [UPDATE PROFILE] userId from middleware:', userId);
-        console.log('📝 [UPDATE PROFILE] Request body:', { username, bio, location });
-        console.log('📝 [UPDATE PROFILE] File present:', !!(req as any).file);
-
+      
         if (!userId) {
             console.log('❌ [UPDATE PROFILE] No userId provided');
             res.status(401).json({ error: 'Unauthorized' });

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, verifyEmail, loginUser } from '../services/authService';
+import { registerUser, verifyEmail, loginUser, resendVerificationEmail } from '../services/authService';
 import { initializeEmailService } from '../services/emailService';
 
 // Initialize email service on startup
@@ -68,6 +68,23 @@ export async function loginController(req: Request, res: Response): Promise<void
         res.status(200).json(result);
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Login failed';
+        res.status(400).json({ error: errorMessage });
+    }
+}
+
+export async function resendVerificationEmailController(req: Request, res: Response): Promise<void> {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            res.status(400).json({ error: 'Email is required' });
+            return;
+        }
+
+        const result = await resendVerificationEmail(email);
+        res.status(200).json(result);
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to resend verification email';
         res.status(400).json({ error: errorMessage });
     }
 }
