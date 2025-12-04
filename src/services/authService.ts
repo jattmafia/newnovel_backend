@@ -137,7 +137,6 @@ export async function loginUser(email: string, password: string): Promise<{ toke
     const token = jwt.sign(
         { userId: user._id?.toString(), email: user.email },
         config.jwtSecret as string,
-        { expiresIn: '7d' }
     );
 
     // Return user data without password
